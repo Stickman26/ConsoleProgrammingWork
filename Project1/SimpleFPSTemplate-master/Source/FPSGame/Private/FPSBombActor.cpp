@@ -23,7 +23,7 @@ void AFPSBombActor::BeginPlay()
 
 void AFPSBombActor::Explode()
 {
-	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionTemplate, GetActorLocation())
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionTemplate, GetActorLocation());
 }
 
 // Called every frame

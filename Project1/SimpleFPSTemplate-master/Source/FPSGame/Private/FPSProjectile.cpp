@@ -43,6 +43,10 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 		Scale *= 0.8f;
 
 		if (Scale.GetMin() < 0.5f) {
+			if (OtherActor->IsA(AFPSCube::StaticClass()))
+			{
+				Cast<AFPSCube>(OtherActor)->Explode();
+			}
 			OtherActor->Destroy();
 		}
 		else

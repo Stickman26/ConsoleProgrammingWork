@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "FPSCube.h"
 #include "FPSProjectile.generated.h"
 
 
