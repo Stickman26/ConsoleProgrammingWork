@@ -40,9 +40,9 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
 		FVector Scale = OtherComp->GetComponentScale();
-		Scale *= 0.8f;
+		Scale *= 0.25f;
 
-		if (Scale.GetMin() < 0.5f) {
+		if (Scale.GetMin() < 0.25f) {
 			if (OtherActor->IsA(AFPSCube::StaticClass()))
 			{
 				Cast<AFPSCube>(OtherActor)->Explode();
@@ -51,7 +51,10 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 		}
 		else
 		{
-			OtherComp->SetWorldScale3D(Scale);
+			//AKAsset* SpawnedActor1 = (AKAsset*) GetWorld()->SpawnActor(AKAsset::StaticClass(), NAME_None, &Location);
+
+			AFPSCube* smallCube = (AFPSCube*) GetWorld()->SpawnActor(AFPSCube::StaticClass());
+			smallCube->GetRootComponent()->SetWorldScale3D(Scale);
 		}
 
 		UMaterialInstanceDynamic* MatInst = OtherComp->CreateAndSetMaterialInstanceDynamic(0);
