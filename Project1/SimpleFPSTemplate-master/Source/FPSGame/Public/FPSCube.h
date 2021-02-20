@@ -18,9 +18,15 @@ class FPSGAME_API AFPSCube : public AStaticMeshActor
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
+		TSubclassOf<AFPSCube> BlueprintCube;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
 		UParticleSystem* ExplosionTemplate;
 
 public:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Explosion")
+		bool canExplode = false;
 
 	UFUNCTION()
 		void Explode();

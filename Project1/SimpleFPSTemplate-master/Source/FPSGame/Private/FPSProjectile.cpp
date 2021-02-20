@@ -39,29 +39,19 @@ void AFPSProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
-		FVector Scale = OtherComp->GetComponentScale();
-		Scale *= 0.25f;
-
-		if (Scale.GetMin() < 0.25f) {
-			if (OtherActor->IsA(AFPSCube::StaticClass()))
-			{
-				Cast<AFPSCube>(OtherActor)->Explode();
-			}
-			OtherActor->Destroy();
-		}
-		else
+		if (OtherActor->IsA(AFPSCube::StaticClass()))
 		{
-			//AKAsset* SpawnedActor1 = (AKAsset*) GetWorld()->SpawnActor(AKAsset::StaticClass(), NAME_None, &Location);
-
-			AFPSCube* smallCube = (AFPSCube*) GetWorld()->SpawnActor(AFPSCube::StaticClass());
-			smallCube->GetRootComponent()->SetWorldScale3D(Scale);
+			Cast<AFPSCube>(OtherActor)->Explode();
 		}
+		OtherActor->Destroy();
 
+		/*
 		UMaterialInstanceDynamic* MatInst = OtherComp->CreateAndSetMaterialInstanceDynamic(0);
 		if (MatInst)
 		{
 			MatInst->SetVectorParameterValue("Color", FLinearColor::MakeRandomColor());
 		}
+		*/
 
 		Destroy();
 	}
