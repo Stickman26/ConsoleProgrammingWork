@@ -2,12 +2,18 @@
 
 
 #include "FPSBombActor.h"
+#include "Kismet/GameplayStatics.h"
+#include "FPSCube.h"
 
 // Sets default values
 AFPSBombActor::AFPSBombActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
+	MeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	RootComponent = MeshComp;
 
 	ExplodeDelay = 2.0f;
 }
@@ -23,7 +29,33 @@ void AFPSBombActor::BeginPlay()
 
 void AFPSBombActor::Explode()
 {
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionTemplate, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionTemplate, GetActorLocation());
+
+	FCollisionObjectQueryParams QueryParams;
+	QueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	QueryParams.AddObjectTypesToQuery(ECC_PhysicsBody);
+
+	FCollisionShape CollShape;
+	CollShape.SetSphere(500.0f);
+
+	TArray<FOverlapResult> OutOverlaps;
+	GetWorld()->OverlapMultiByObjectType(OutOverlaps, GetActorLocation(), FQuat::Identity, QueryParams, CollShape);
+
+	for (FOverlapResult Result : OutOverlaps)
+	{
+		UPrimitiveComponent* Overlap = Result.GetComponent();
+		if (Overlap && Overlap->IsSimulatingPhysics())
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString(Overlap->GetOwner()->GetClass()->GetSuperClass()->GetFName().ToString()));
+			if (Overlap->GetOwner()->GetClass()->GetSuperClass() == AFPSCube::StaticClass())
+			{
+				Cast<AFPSCube>(Overlap->GetOwner()->GetClass()->GetSuperClass())->Explode();
+				Overlap->GetOwner()->Destroy();
+			}
+		}
+	}
+
+	Destroy();
 }
 
 // Called every frame

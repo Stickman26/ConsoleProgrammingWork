@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Kismet/GameplayStatics.h"
 #include "FPSBombActor.generated.h"
+
 
 UCLASS()
 class FPSGAME_API AFPSBombActor : public AActor
@@ -28,6 +28,9 @@ protected:
 
 	UFUNCTION()
 	void Explode();
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* MeshComp;
 
 public:	
 	// Called every frame

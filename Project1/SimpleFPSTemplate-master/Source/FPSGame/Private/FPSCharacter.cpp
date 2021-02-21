@@ -2,6 +2,7 @@
 
 #include "FPSCharacter.h"
 #include "FPSProjectile.h"
+#include "FPSBombActor.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -38,11 +39,8 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
-	PlayerInputComponent->BindAction("FireBombDown", IE_Pressed, this, &AFPSCharacter::FireBombDown);
-	PlayerInputComponent->BindAction("FireBomb", IE_Released, this, &AFPSCharacter::FireBomb);
-	
-
-	PlayerInputComponent->BindAction("SpawnBomb", IE_Pressed, this, &AFPSCharacter::SpawnBomb);
+	//PlayerInputComponent->BindAction("FireBombDown", IE_Pressed, this, &AFPSCharacter::FireBombDown);
+	PlayerInputComponent->BindAction("FireBomb", IE_Pressed, this, &AFPSCharacter::SpawnBomb);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AFPSCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AFPSCharacter::MoveRight);
@@ -125,10 +123,6 @@ void AFPSCharacter::FireBomb()
 		Fire();
 		bCooldown = true;
 	}
-	else
-	{
-		//do nothing because it's on cooldown
-	}
 
 	FTimerHandle weaponCooldown;
 
@@ -152,8 +146,7 @@ void AFPSCharacter::FireBombCooldown()
 
 void AFPSCharacter::SpawnBomb() 
 {
-
-	AActor* MyMomb = GetWorld()->SpawnActor<AActor>(BombClass, GetActorLocation(), GetActorRotation());
+	AFPSBombActor* MyMomb = GetWorld()->SpawnActor<AFPSBombActor>(BombClass, GetActorLocation(), GetActorRotation());
 }
 
 

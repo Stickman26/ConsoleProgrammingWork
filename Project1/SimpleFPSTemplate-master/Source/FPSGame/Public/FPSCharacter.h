@@ -10,6 +10,7 @@ class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
 class AFPSProjectile;
+class AFPSBombActor;
 class USoundBase;
 class UAnimSequence;
 
@@ -41,7 +42,7 @@ public:
 	TSubclassOf<AFPSProjectile> ProjectileClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Bombs")
-	TSubclassOf<AActor> BombClass;
+	TSubclassOf<AFPSBombActor> BombClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay")
@@ -50,9 +51,6 @@ public:
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	UAnimSequence* FireAnimation;
-
-	UPROPERTY(EditDefaultsOnly) bool bCooldown;
-	UPROPERTY(EditDefaultsOnly) float timeDown;
 
 protected:
 	
@@ -72,6 +70,9 @@ protected:
 	void MoveRight(float Val);
 
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+
+	UPROPERTY(EditDefaultsOnly) bool bCooldown;
+	UPROPERTY(EditDefaultsOnly) float timeDown;
 
 public:
 	/** Returns Mesh1P subobject **/
