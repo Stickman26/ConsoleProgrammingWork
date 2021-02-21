@@ -51,10 +51,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	UAnimSequence* FireAnimation;
 
+	UPROPERTY(EditDefaultsOnly) bool bCooldown;
+	UPROPERTY(EditDefaultsOnly) float timeDown;
+
 protected:
 	
 	/** Fires a projectile. */
 	void Fire();
+
+	void FireBomb();
+	void FireBombDown();
+	void FireBombCooldown();
 
 	void SpawnBomb();
 
