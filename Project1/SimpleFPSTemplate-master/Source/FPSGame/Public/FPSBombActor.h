@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "FPSBombActor.generated.h"
 
+class UProjectileMovementComponent;
 
 UCLASS()
 class FPSGAME_API AFPSBombActor : public AActor
@@ -32,8 +33,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UProjectileMovementComponent* ProjComp;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void SetVelocity(float speed);
 };

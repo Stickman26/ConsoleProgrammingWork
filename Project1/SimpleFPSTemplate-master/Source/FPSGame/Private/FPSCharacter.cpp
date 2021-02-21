@@ -39,8 +39,7 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
-	//PlayerInputComponent->BindAction("FireBombDown", IE_Pressed, this, &AFPSCharacter::FireBombDown);
-	PlayerInputComponent->BindAction("FireBomb", IE_Pressed, this, &AFPSCharacter::SpawnBomb);
+	PlayerInputComponent->BindAction("FireBomb", IE_Released, this, &AFPSCharacter::SpawnBomb);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AFPSCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AFPSCharacter::MoveRight);
@@ -49,6 +48,12 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 }
 
+void AFPSCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	timeDown = GetWorld()->GetFirstPlayerController()->GetInputKeyTimeDown(FKey("LeftShift"));
+}
 
 void AFPSCharacter::Fire()
 {
@@ -86,67 +91,40 @@ void AFPSCharacter::Fire()
 	}
 }
 
-void AFPSCharacter::FireBomb()
-{
-	float timeDown2 = GetWorld()->TimeSeconds;
-	timeDown2 -= timeDown;
-
-	//this was given to me by Ben but I couldn't get it to function properly so I attempted to determine how long the button was held by getting the world time when the button is pressed and again when released
-	// Link -> https://answers.unrealengine.com/questions/569883/getting-input-key-time-down-in-c.html
-	timeDown = GetWorld()->GetFirstPlayerController()->GetInputKeyTimeDown(FKey("LeftShift"));
-
-	/*if(timeDown <= 0.0f)
-	{
-		GetWorld()->GetFirstPlayerController()->GetInputKeyTimeDown(FKey("RightShift"));
-	}*/
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString("timeDown = " + FString::SanitizeFloat(timeDown) + "\ntimeDown2 = " + FString::SanitizeFloat(timeDown2)));
-
-	if(timeDown2 <= 1.0f && !bCooldown)
-	{
-		Fire();
-		bCooldown = true;
-	}
-	else if(timeDown2 <= 2.5f && timeDown > 1.0f && !bCooldown)
-	{
-		Fire();
-		Fire();
-		Fire();
-		bCooldown = true;
-	}
-	else if(timeDown2 > 2.5f && !bCooldown)
-	{
-		Fire();
-		Fire();
-		Fire();
-		Fire();
-		Fire();
-		bCooldown = true;
-	}
-
-	FTimerHandle weaponCooldown;
-
-	if(bCooldown)
-	{
-		//GetWorldTimerManager().SetTimer<AFPSCharacter>(weaponCooldown, this, AFPSCharacter::FireBombCooldown(), 3.0f, false);
-		GetWorldTimerManager().SetTimer(weaponCooldown, this, &AFPSCharacter::FireBombCooldown, 3.0f);
-	}
-}
-
-void AFPSCharacter::FireBombDown()
-{
-	//timeDown = GetWorld()->DeltaTimeSeconds;
-	timeDown = GetWorld()->TimeSeconds;
-}
-
 void AFPSCharacter::FireBombCooldown()
 {
+	bTimerStarted = false;
 	bCooldown = false;
 }
 
 void AFPSCharacter::SpawnBomb() 
 {
-	AFPSBombActor* MyMomb = GetWorld()->SpawnActor<AFPSBombActor>(BombClass, GetActorLocation(), GetActorRotation());
+	FTimerHandle weaponCooldown;
+
+	if (bCooldown && !bTimerStarted)
+	{
+		bTimerStarted = true;
+		//GetWorldTimerManager().SetTimer<AFPSCharacter>(weaponCooldown, this, AFPSCharacter::FireBombCooldown(), 3.0f, false);
+		GetWorldTimerManager().SetTimer(weaponCooldown, this, &AFPSCharacter::FireBombCooldown, 3.0f);
+	}
+	else if (!bCooldown)
+	{
+		bCooldown = true;
+
+		// Grabs location from the mesh that must have a socket called "Muzzle" in his skeleton
+		FVector MuzzleLocation = GunMeshComponent->GetSocketLocation("Muzzle");
+		// Use controller rotation which is our view direction in first person
+		FRotator MuzzleRotation = GetControlRotation();
+
+		//Set Spawn Collision Handling Override
+		FActorSpawnParameters ActorSpawnParams;
+		ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString("timeDown = " + FString::SanitizeFloat(timeDown)));
+
+		AFPSBombActor* MyBomb = GetWorld()->SpawnActor<AFPSBombActor>(BombClass, MuzzleLocation, MuzzleRotation, ActorSpawnParams);
+		MyBomb->SetVelocity(timeDown * 1000.0f);
+	}
 }
 
 

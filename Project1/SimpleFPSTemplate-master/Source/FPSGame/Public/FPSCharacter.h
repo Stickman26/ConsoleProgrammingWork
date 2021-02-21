@@ -52,13 +52,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay")
 	UAnimSequence* FireAnimation;
 
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	
 	/** Fires a projectile. */
 	void Fire();
 
-	void FireBomb();
-	void FireBombDown();
 	void FireBombCooldown();
 
 	void SpawnBomb();
@@ -71,7 +71,8 @@ protected:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
-	UPROPERTY(EditDefaultsOnly) bool bCooldown;
+	UPROPERTY(EditDefaultsOnly) bool bCooldown = false;
+	UPROPERTY(EditDefaultsOnly) bool bTimerStarted = false;
 	UPROPERTY(EditDefaultsOnly) float timeDown;
 
 public:

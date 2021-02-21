@@ -5,11 +5,15 @@
 
 void AFPSCube::Explode() 
 {
-	if (!canExplode) 
+	if (canExplode) 
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionTemplate, GetActorLocation());
+	}
+	else 
 	{
 		FVector Scale = this->GetActorScale();
 		Scale *= 0.25f;
-		
+
 		float OffScale = 10.0f;
 
 		FVector Offsets[] = {
@@ -25,10 +29,6 @@ void AFPSCube::Explode()
 			smallCube->GetRootComponent()->SetWorldScale3D(Scale);
 			smallCube->canExplode = true;
 		}
-	}
-	else 
-	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionTemplate, GetActorLocation());
 	}
 	
 }

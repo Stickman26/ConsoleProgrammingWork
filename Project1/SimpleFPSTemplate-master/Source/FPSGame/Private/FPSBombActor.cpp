@@ -3,6 +3,7 @@
 
 #include "FPSBombActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "FPSCube.h"
 
 // Sets default values
@@ -14,6 +15,9 @@ AFPSBombActor::AFPSBombActor()
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
 	MeshComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	RootComponent = MeshComp;
+
+	ProjComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
+	ProjComp->InitialSpeed = 0.0f;
 
 	ExplodeDelay = 2.0f;
 }
@@ -46,10 +50,11 @@ void AFPSBombActor::Explode()
 		UPrimitiveComponent* Overlap = Result.GetComponent();
 		if (Overlap && Overlap->IsSimulatingPhysics())
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString(Overlap->GetOwner()->GetClass()->GetSuperClass()->GetFName().ToString()));
+			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, FString(Overlap->GetOwner()->GetClass()->GetSuperClass()->GetFName().ToString()));
+
 			if (Overlap->GetOwner()->GetClass()->GetSuperClass() == AFPSCube::StaticClass())
 			{
-				Cast<AFPSCube>(Overlap->GetOwner()->GetClass()->GetSuperClass())->Explode();
+				Cast<AFPSCube>(Overlap->GetOwner())->Explode();
 				Overlap->GetOwner()->Destroy();
 			}
 		}
@@ -63,5 +68,10 @@ void AFPSBombActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AFPSBombActor::SetVelocity(float speed)
+{
+	ProjComp->SetVelocityInLocalSpace(FVector(speed, 0, 0));
 }
 
